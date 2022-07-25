@@ -22,7 +22,19 @@ function restricted(req, res, next) {
   }
 */
 async function checkUsernameFree(req, res, next) {
-  await Users.findById({ username: req.user.username }).first()
+  try{
+    const users = await Users.findBy({ username: req.body.username })
+    if(!users.length){ 
+      next()
+    }
+    else {
+      next({ 'message': "Username taken", status: 422})
+    }
+
+  } catch(err){
+    next(err)
+  }
+  
 }
 
 /*
@@ -34,12 +46,19 @@ async function checkUsernameFree(req, res, next) {
   }
 */
 async function checkUsernameExists(req, res, next) {
-  const result = await Users.findById({ username: req.user.username }).first()
-  if(result != null){
-    next({ status: 400, message: 'username unavailable'})
-  }
+  try{
+    const users = await Users.findBy({ username: req.body.username })
+    if(users.length){ 
+      next()
+    }
+    else {
+      next({ 'message': "Invalid credentials"})
+    }
 
-  next()
+  } catch(err){
+    next(err)
+  }
+  
 }
 
 /*
@@ -51,13 +70,11 @@ async function checkUsernameExists(req, res, next) {
   }
 */
 function checkPasswordLength(req, res, next) {
-  let { username, password} = req.body
-  if( typeof username != 'string' || username.length() < 3){
-    next({ status: 422, message: "Password must be longer than 3 chars"})
-    return
+  if(!req.body.password || req.body.password.length < 3){
+    next({ message: "Password must be longer than 3 chars", status: 422})
+  } else{
+    next()
   }
-
-  next()
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules

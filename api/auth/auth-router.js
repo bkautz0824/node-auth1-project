@@ -58,7 +58,7 @@ const {checkPasswordLength, checkUsernameExists, checkUsernameFree, restricted} 
   }
  */
 
-  router.post('/login',checkPassowrdLength, async (req, res, next) => {
+  router.post('/login',checkPasswordLength, async (req, res, next) => {
     try{ 
     const { username, password } = req.body;
 
